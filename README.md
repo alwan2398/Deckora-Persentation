@@ -6,7 +6,7 @@ Anyone can turn a prompt into a presentation, view it immediately in presentatio
 
 **Status:** Planning documents are complete (PRD, AGENTS, Design). Build has not started yet. This README describes the v1 target, not a finished product.
 
-**Repository:** https://github.com/alwan2398/slider-ai-persentation
+**Repository:** https://github.com/alwan2398/Deckora-Persentation
 
 **Related documents:** `PRD.md` defines what to build. `AGENTS.md` defines how to work on this project. `Design.md` defines how Deckora must look and feel.
 
@@ -101,17 +101,17 @@ User journey in v1:
 
 ## Tech stack
 
-| Area | Choice |
-|---|---|
-| Framework | Next.js 16, App Router, no `src` folder, TypeScript |
-| UI | Tailwind CSS v4, shadcn UI, Aceternity UI, Framer Motion |
-| State | Zustand for slide and editor state |
-| Auth | Better Auth, Google login |
-| Database | Neon Postgres with Drizzle ORM |
-| AI | Vercel AI SDK, Apinex and OpenRouter, with real-time streaming |
-| Image upload | Uploadcare, proposed, to confirm (following the Vivid pattern) |
-| Payment (v2 only) | Midtrans |
-| Deployment | Vercel |
+| Area              | Choice                                                         |
+| ----------------- | -------------------------------------------------------------- |
+| Framework         | Next.js 16, App Router, no `src` folder, TypeScript            |
+| UI                | Tailwind CSS v4, shadcn UI, Aceternity UI, Framer Motion       |
+| State             | Zustand for slide and editor state                             |
+| Auth              | Better Auth, Google login                                      |
+| Database          | Neon Postgres with Drizzle ORM                                 |
+| AI                | Vercel AI SDK, Apinex and OpenRouter, with real-time streaming |
+| Image upload      | Uploadcare, proposed, to confirm (following the Vivid pattern) |
+| Payment (v2 only) | Midtrans                                                       |
+| Deployment        | Vercel                                                         |
 
 Note on the repository snapshot (2026-10-27): the repository already listed Next.js 16.4.2, React 19.3.0, Drizzle ORM, Neon serverless, Tailwind CSS v4, Framer Motion, and shadcn tooling. Better Auth, Zustand, Vercel AI SDK, and Uploadcare were not shown as installed in that snapshot. Treat them as planned additions and verify the current `package.json` at Build time before claiming they are installed.
 
@@ -185,22 +185,22 @@ npm install
 
 Create a local environment file (for example `.env.local`) with the variable names below. Values are never written in documentation.
 
-| Variable | Notes |
-|---|---|
-| `DATABASE_URL` | Neon Postgres connection |
-| `BETTER_AUTH_SECRET` | Better Auth secret |
-| `BETTER_AUTH_URL` | App URL used by Better Auth |
-| `GOOGLE_CLIENT_ID` | Google login |
-| `GOOGLE_CLIENT_SECRET` | Google login |
-| `APINEX_API_KEY` | Apinex, primary provider |
-| `APINEX_BASE_URL` | `https://api.apinex.bond/v1` |
-| `APINEX_MODEL` | First model: GLM 5.3 Flash. Confirm the exact model ID from the provider dashboard at Build time |
-| `OPENROUTER_API_KEY` | OpenRouter, secondary and fallback provider |
-| `OPENROUTER_MODEL` | Deferred. Do not guess a model ID until the user has reviewed the free OpenRouter models |
-| `UPLOADCARE_PUBLIC_KEY` | Image upload, to confirm |
-| `UPLOADCARE_SECRET_KEY` | Image upload, to confirm |
-| `MIDTRANS_SERVER_KEY` | v2 only, not required in v1 |
-| `MIDTRANS_CLIENT_KEY` | v2 only, not required in v1 |
+| Variable                | Notes                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`          | Neon Postgres connection                                                                         |
+| `BETTER_AUTH_SECRET`    | Better Auth secret                                                                               |
+| `BETTER_AUTH_URL`       | App URL used by Better Auth                                                                      |
+| `GOOGLE_CLIENT_ID`      | Google login                                                                                     |
+| `GOOGLE_CLIENT_SECRET`  | Google login                                                                                     |
+| `APINEX_API_KEY`        | Apinex, primary provider                                                                         |
+| `APINEX_BASE_URL`       | `https://api.apinex.bond/v1`                                                                     |
+| `APINEX_MODEL`          | First model: GLM 5.3 Flash. Confirm the exact model ID from the provider dashboard at Build time |
+| `OPENROUTER_API_KEY`    | OpenRouter, secondary and fallback provider                                                      |
+| `OPENROUTER_MODEL`      | Deferred. Do not guess a model ID until the user has reviewed the free OpenRouter models         |
+| `UPLOADCARE_PUBLIC_KEY` | Image upload, to confirm                                                                         |
+| `UPLOADCARE_SECRET_KEY` | Image upload, to confirm                                                                         |
+| `MIDTRANS_SERVER_KEY`   | v2 only, not required in v1                                                                      |
+| `MIDTRANS_CLIENT_KEY`   | v2 only, not required in v1                                                                      |
 
 ### Run
 
@@ -212,12 +212,12 @@ Then open the address shown by the dev server in the terminal.
 
 ### Scripts
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Start the development server |
-| `npm run lint` | Run lint checks |
-| `npm run build` | Build for production |
-| `npm run start` | Start the production server |
+| Command         | Purpose                      |
+| --------------- | ---------------------------- |
+| `npm run dev`   | Start the development server |
+| `npm run lint`  | Run lint checks              |
+| `npm run build` | Build for production         |
+| `npm run start` | Start the production server  |
 
 Report the real output of these commands. Do not claim a command passed if it failed.
 

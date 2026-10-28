@@ -191,3 +191,17 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+/* Scrollbar — hidden. Scrolling still works via mouse, touch, keyboard, and anchor links. */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / legacy Edge */
+}
+
+::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+  width: 0;
+  height: 0;
+}
+
+/* Chip animations are handled by Framer Motion in floating-chip.tsx. */
