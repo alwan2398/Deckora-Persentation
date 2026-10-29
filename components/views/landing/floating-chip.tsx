@@ -1,32 +1,97 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "cn";
 
+const TRIANGLE_W = 16;
+const TRIANGLE_H = 20;
+
+/**
+ * Props for a floating workflow chip (Prompt / Outline / Theme / Share).
+ */
 export interface FloatingChipProps {
+  /** Label text, e.g. "Prompt". */
   label: string;
+  /** "left" or "right" decides the triangle side and pointer direction. */
   side: "left" | "right";
   /** Entrance animation delay in seconds. Staggered: 0, 0.12, 0.24, 0.36. */
   delay: number;
-  /** Tailwind absolute-position classes, e.g. "left-[13%] top-[30%]". */
+  /**
+   * Tailwind absolute-position + visibility classes applied to the outermost
+   * wrapper, e.g. "hidden lg:flex left-[13%] top-[30%]".
+   */
   positionClassName: string;
+}
+
+/**
+ * Triangle SVG that sits beside the chip box, pointing toward the hero center.
+ *
+ * Left chip: triangle is the second flex child, points right (toward center).
+ * Right chip: triangle is the first flex child, points left (toward center).
+ *
+ * Polygon coords: left side "0,0 16,10 0,20" (tip at right midpoint).
+ *                 right side "16,0 0,10 16,20" (tip at left midpoint).
+ */
+function Triangle({ side }: { side: "left" | "right" }) {
+  const points =
+    side === "left"
+      ? `0,0 ${TRIANGLE_W},${TRIANGLE_H / 2} 0,${TRIANGLE_H}`
+      : `${TRIANGLE_W},0 0,${TRIANGLE_H / 2} ${TRIANGLE_W},${TRIANGLE_H}`;
+
+  return (
+    <svg
+      width={TRIANGLE_W}
+      height={TRIANGLE_H}
+      viewBox={`0 0 ${TRIANGLE_W} ${TRIANGLE_H}`}
+      className="shrink-0"
+      aria-hidden="true"
+    >
+      <polygon points={points} fill="currentColor" />
+    </svg>
+  );
+}
+
+/**
+ * The visual chip: label + attached triangle as a single flex row.
+ * Left chips: [box][triangle→]  Right chips: [←triangle][box]
+ * The triangle is a flex sibling of the box, not absolutely positioned,
+ * so it can never escape the wrapper and get clipped independently.
+ */
+function ChipBody({ label, side }: { label: string; side: "left" | "right" }) {
+  if (side === "left") {
+    return (
+      <div className="flex items-center text-primary gap-1.5">
+        <span className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm">
+          {label}
+        </span>
+        <Triangle side="left" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center text-primary gap-1.5">
+      <Triangle side="right" />
+      <span className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm">
+        {label}
+      </span>
+    </div>
+  );
 }
 
 /**
  * Animated floating chip for the hero section (desktop only).
  *
- * Hydration strategy: the component mounts fully visible (opacity 1, no
- * transform) on both server and client so SSR HTML always matches the client's
- * initial render. After the first client paint, a `mounted` flag flips, and
- * Framer Motion replays the entrance from the hidden start state.
- *
  * Two nested motion elements keep entrance and float transforms independent:
- *   - Outer: entrance once on mount (opacity, scale, y) via variants.
- *   - Inner: gentle infinite 4px bob, starts after entrance finishes.
+ *   Outer motion.div — entrance: opacity + scale + y, runs once on every mount.
+ *   Inner motion.div — gentle 4px infinite bob, starts after entrance finishes.
  *
- * Reduced motion: useReducedMotion skips both animations and stays at the
- * visible state so reduced-motion users always see the chips.
+ * positionClassName carries the Tailwind absolute-position classes (top, left/right)
+ * AND the responsive visibility class (hidden lg:flex), applied to the outer wrapper
+ * so both the animated and reduced-motion paths behave identically.
+ *
+ * Reduced motion: chips render immediately at full opacity with no animation,
+ * so reduced-motion users never see a hidden or missing chip.
  */
 export function FloatingChip({
   label,
@@ -35,70 +100,37 @@ export function FloatingChip({
   positionClassName,
 }: FloatingChipProps) {
   const shouldReduceMotion = useReducedMotion();
-  // Start false on both server and client so SSR HTML matches.
-  // Flip to true after the first paint to trigger the entrance animation.
-  const [mounted, setMounted] = useState(false);
+  const floatDelay = delay + 0.6;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const entranceDuration = 0.6;
-  const floatDelay = delay + entranceDuration;
-
-  // Variants keep the initial/animate values consistent across renders.
-  const entranceVariants = {
-    hidden: { opacity: 0, scale: 0.85, y: 12 },
-    visible: { opacity: 1, scale: 1, y: 0 },
-  };
-
-  // Before mount: render at the visible end state (no animation).
-  // After mount with reduced motion: stay at visible, no animation.
-  // After mount without reduced motion: animate from hidden to visible.
-  const animateState = "visible";
-  const initialState = mounted && !shouldReduceMotion ? "hidden" : "visible";
+  if (shouldReduceMotion) {
+    return (
+      <div
+        className={cn("pointer-events-none absolute z-20", positionClassName)}
+        aria-hidden="true"
+      >
+        <ChipBody label={label} side={side} />
+      </div>
+    );
+  }
 
   return (
-    // Outer element: entrance animation, runs once after mount.
     <motion.div
-      className={cn(
-        "pointer-events-none absolute items-center",
-        positionClassName,
-      )}
+      className={cn("pointer-events-none absolute z-20", positionClassName)}
       aria-hidden="true"
-      variants={entranceVariants}
-      initial={initialState}
-      animate={animateState}
-      transition={
-        mounted && !shouldReduceMotion
-          ? { duration: entranceDuration, delay, ease: [0.22, 1, 0.36, 1] }
-          : { duration: 0 }
-      }
+      initial={{ opacity: 0, scale: 0.85, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Inner element: gentle infinite float, starts after entrance. */}
       <motion.div
-        className="relative flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white shadow-sm"
-        animate={mounted && !shouldReduceMotion ? { y: [0, -4, 0] } : undefined}
-        transition={
-          mounted && !shouldReduceMotion
-            ? { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: floatDelay }
-            : undefined
-        }
+        animate={{ y: [0, -4, 0] }}
+        transition={{
+          duration: 3.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: floatDelay,
+        }}
       >
-        {label}
-
-        {/* Triangle pointer inside the motion element so it animates with the chip. */}
-        <span
-          className={cn(
-            "pointer-events-none absolute top-1.5",
-            side === "left"
-              ? // Left chip: triangle on right edge, pointing right toward center.
-                "left-full border-y-[6px] border-l-10 border-y-transparent border-l-primary ml-[1px]"
-              : // Right chip: triangle on left edge, pointing left toward center.
-                "right-full border-y-[6px] border-r-10 border-y-transparent border-r-primary mr-[1px]",
-          )}
-          aria-hidden="true"
-        />
+        <ChipBody label={label} side={side} />
       </motion.div>
     </motion.div>
   );

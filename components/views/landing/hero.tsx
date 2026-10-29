@@ -30,14 +30,14 @@ function chipPositionClass(
   side: "left" | "right",
   position: "upper" | "lower",
 ): string {
-  const base = "hidden lg:flex";
+  const base = "hidden lg:block";
   if (side === "left" && position === "upper")
-    return `${base} left-[13%] top-[30%]`;
+    return `${base} left-[13%] top-[57%]`;
   if (side === "left" && position === "lower")
-    return `${base} left-[15%] top-[57%]`;
+    return `${base} left-[20%] top-[72%]`;
   if (side === "right" && position === "upper")
-    return `${base} right-[13%] top-[30%]`;
-  return `${base} right-[15%] top-[57%]`;
+    return `${base} right-[13%] top-[57%]`;
+  return `${base} right-[20%] top-[72%]`;
 }
 
 /**
